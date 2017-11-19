@@ -1,0 +1,88 @@
+﻿
+<div class="modal" id="ModalMsg" role="dialog" tabindex="-1">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "formMsg" }))
+    {
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color:#2fa4e7">
+                    <center> <h4 class="modal-title"> <label id="lbltitle" style="font-size:medium; color:black;"></label> </h4> </center>
+                </div>
+
+                <div class="modal-body">
+                    <center> <label id="lblmsg"></label> </center>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="cancelar" class="btn btn-default btn-sm" data-dismiss="modal"> Cancela </button>
+                    <button id="confirma" type="button" class="btn btn-primary btn-sm"> Confirma </button>
+                    <button id="OK" class="btn btn-primary btn-md" data-dismiss="modal"> OK </button>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    var selection = new Array();
+    var opcional = "";//Parametro opcional
+    var vetoropcional = "";//Parametro vetoropcional
+
+    /*Mensagens */
+    function ShowInternalError() {
+        $('#formMsg').prop('action', '');
+        $('#cancelar').css('display', 'none');
+        $('#confirma').css('display', 'none');
+        $('#OK').css('display', 'inline');
+        $('#lbltitle').html('Erro Interno!');
+        $('#lblmsg').html('Favor Contatar o Adiministrador do Sistema!');
+        $('#ModalMsg').modal('show');
+    }
+
+    function ShowModalMSG(MSG, Title) {
+        if (Title == null) Title = "System Police";
+        $('#formMsg').prop('action', '');
+        $('#cancelar').css('display', 'none');
+        $('#confirma').css('display', 'none');
+        $('#OK').css('display', 'inline');
+        $('#lbltitle').html(Title);
+        $('#lblmsg').html(MSG);
+        $('#ModalMsg').modal();
+    }
+
+    /*Perguntas */
+    function SetModalConfirm(MSG, action, Title) {
+        if (Title == null) Title = "System Police";
+        $('#formMsg').prop('action', action);
+        $('#cancelar').css('display', 'inline');
+        $('#confirma').css('display', 'inline');
+        $('#OK').css('display', 'none');
+        $('#lbltitle').html(Title);
+        $('#lblmsg').html(MSG);
+        $('#ModalMsg').modal();
+    }
+
+    $('#confirma').click(function () {
+        var action = $('#formMsg').prop('action');
+        if (action != null) {
+            $('#ModalMsg').modal('hide');
+
+            $.post(action, { param: selection.toString(), param_opcional: opcional, vetor_opcional: vetoropcional.toString() }, function (data) {
+                if (data.status === "success") {
+                    ShowModalMSG(data.msg);
+                    UpdateGrid(data.control, opcional, data.div);
+                    opcional = "";
+                } else if (data.status === "error") {
+                    ShowModalMSG(data.title, data.msg);
+                } else if (data.status === "errorInternal") {
+                    ShowInternalError();
+                }
+            }).fail(function (xhr, textStatus, errorThrown) {
+                ShowInternalError();
+            });
+        }
+    });
+
+</script>
+

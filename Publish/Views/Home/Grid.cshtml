@@ -1,0 +1,44 @@
+﻿<style>
+    th a {
+        color: #ffffff;
+    }
+</style>
+
+<div id="ajaxgrid">
+    @{
+        var grid = new WebGrid(Model, defaultSort: "meliante", canPage: true, rowsPerPage: 10, ajaxUpdateContainerId: "ajaxgrid", ajaxUpdateCallback: "GridUpdate");
+
+        @MvcHtmlString.Create(grid.GetHtml(
+          tableStyle: "table table-condensed table-hover table-striped",
+          headerStyle: "btn-primary",
+          footerStyle: "btn-primary",
+
+          firstText: "Primeiro",
+          previousText: "Anterior",
+          nextText: "Proximo",
+          lastText: "Ultimo",
+          mode: WebGridPagerModes.All,
+
+     columns:
+        grid.Columns(
+
+            grid.Column("", header: "{CheckBoxHeading}", format: @<input type="checkbox" class="box checkbox" id="chk_select" value="@item.ID" />),
+                      grid.Column("local", Geral.Sorter("local", "Local", grid)),
+                      grid.Column("policia", Geral.Sorter("policia", "Policial", grid)),
+                      grid.Column("meliante", Geral.Sorter("meliante", "Meliante", grid)),
+                      grid.Column("data", Geral.Sorter("data", "Data", grid))
+                      )).ToString().Replace("{CheckBoxHeading}", "<input type='checkbox' class='checkbox' id='allBox'/>"))
+    }
+</div>
+
+<script>
+    $("#gridTotal").html("Total " + @grid.TotalRowCount.ToString());
+    CheckAll();
+    CheckClick();
+    function GridUpdate() {
+        CheckAll();
+        CheckClick();
+        $("#gridTotal").html("Total " + @grid.TotalRowCount.ToString());
+    }
+</script>
+

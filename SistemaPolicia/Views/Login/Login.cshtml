@@ -1,0 +1,72 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Police System</title>
+
+    <link href="~/Content/Menu/_all-skins.css" rel="stylesheet" />
+    <link href="~/Content/Menu/AdminLTE.css" rel="stylesheet" />
+
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/PM")
+  
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <img src="~/Image/logo_01.png" />
+            <span><b>The Police </b>System</span>
+        </div>
+
+        <div id="divLogin" class="login-box-body">
+            <p class="login-box-msg">Informe os dados para acesso</p>
+            <form id="formLogin">
+                <div class="form-group input-group">
+                    <input id="txtNome" type="text" class="form-control" placeholder="Nome" />
+                    <span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+                </div>
+                <div class="form-group input-group">
+                    <input id="txtSenha" type="password" class="form-control" placeholder="Senha" />
+                    <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-8">
+                        <input type="checkbox" id="chkLembrar" />  &nbsp; Lembrar @*Gravar no storage a senha e email criptografado*@
+                    </div>
+                    <div class="col-xs-4">
+                        <button type="button" id="btnEntrar" class="btn btn-primary btn-block"> Entrar </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/PM")
+    <script>
+        PNotify.prototype.options.styling = "fontawesome";
+        PNotify.prototype.options.title = "Police System";
+
+        $("#btnEntrar").click(function () {
+            $.post("/Login/Login", { nome: $("#txtNome").val(), senha: $("#txtSenha").val() }, function (data) {
+                if (data.status === "success") {
+                    window.open("../Home/Index", "_self");
+                } else if (data.status === "ErrorNUll") {
+                    new PNotify({ text: 'Preencha os Campos Login e Senha', type: 'error' });
+                } else if (data.status == "error") {
+                    new PNotify({ text: 'Login ou Senha Invalido', type: 'error' });
+                }
+            }).fail(function (xhr, error) {
+                new PNotify({ text: 'Servidor Nao Encontrado Verifique o Acesso a Internet', type: 'error' })
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+﻿@using System.Web.Mvc;
+@using SistemaPolicia.Models;
+@model List<Ocorrencia>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Ocorrências";
+}
+
+<!--Botões e Grid-->
+<div class="col-lg-12" name="dv_head" style="background-color:#fff">
+    <h4>Ocorrências <label id="gridTotal" style="float:right;font-size:19px"></label></h4>
+    <div class="col-md-8 col-sm-8" style="padding-left:0px">
+        <button witdh="50" title="Novo" class="btn btn-primary btn-sm" onclick="Inserir()"><img src="~/Images/add-list.png" /><br />Novo</button>
+        <button witdh="50" title="Editar" class="btn btn-primary btn-sm" onclick="Editar()"><img src="~/Images/edit.png" /><br />Editar</button>
+        <button witdh="50" title="Excluir" class="btn btn-primary btn-sm" onclick="Excluir()"><img src="~/Images/delete.png" /><br />Excluir</button>
+    </div>
+    <div id="divgrid">
+        @Html.Partial("Grid")
+    </div>
+</div>
+
+<!--FormView-->
+<div class="modal" id="ViewModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "FormView" }))
+            {
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="tmodal"> </h4>
+                </div>
+                <div class="modal-body row" id="ModalRender">
+                    @Html.Partial("Form", new Ocorrencia())
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Voltar</button>
+                    <button type="button" class="btn btn-default btn-sm" onclick="clearForm('FormView')">Limpar</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="SalvarButton">Salvar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $("#SalvarButton").click(function () {
+        $.ajax({
+            url: $("#FormView").attr('action'),
+            type: "POST",
+            data: $("#FormView").serialize(),
+            success: function (data) {
+
+                if (data.status === "success") {
+                    $('#ViewModal').modal('hide');
+                    ShowModalMSG(data.msg);
+                    UpdateGrid("Home", "");
+                } else if (data.status === "errorInternal") {
+                    $('#ViewModal').modal('hide');
+                    ShowInternalError();
+                }
+            },
+            error: function (xhr, textStatus) {
+                $('#ViewModal').modal('hide');
+                ShowInternalError();
+            }
+        });
+    });
+
+    function Inserir() {
+        clearForm("FormView");
+        $("#FormView").attr("action", "/Home/Inserir");
+        $("#tmodal").html("Nova Ocorrência");
+        $("#ViewModal").modal();
+    }
+
+    function Editar() {
+
+        selection = SelCheck();
+        if (selection.length == 1) {
+
+            $.post("/Home/CreateForm", { id: selection[0] }, function (data) {
+                $("#ModalRender").html(data);
+                $("#FormView").attr("action", "/Home/Editar");
+                $("#tmodal").html("Editar Ocorrência");
+                $("#ViewModal").modal();
+            })
+
+        } else if (selection.length > 1) {
+            ShowModalMSG("Selecione apenas uma Ocorrência para edição!");
+        } else {
+            ShowModalMSG("Selecione uma ocorrência para edição");
+        }
+    }
+
+    function Excluir() {
+        selection = SelCheck();
+        if (selection.length != 0) {
+            SetModalConfirm("Você realmente deseja excluir esse(s) cliente(s)?", "/Home/Excluir");
+        } else {
+            ShowModalMSG("Você deve seleceionar ao menos um cliente para excluir!");
+        }
+    }
+</script>

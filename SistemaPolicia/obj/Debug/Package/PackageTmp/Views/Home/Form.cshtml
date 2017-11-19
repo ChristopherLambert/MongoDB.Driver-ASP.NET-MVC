@@ -1,0 +1,26 @@
+﻿@using System.Web.Mvc;
+@using SistemaPolicia.Models;
+@model Ocorrencia
+
+<div class="col-lg-12 center_form">
+    <label for="local">Local</label> <br />
+    @Html.TextBox("local", Model.local, new { @size = "100", @maxlength = "100" })
+</div>
+<div class="col-lg-12 center_form">
+    <label for="policia">Policial</label> <br />
+    @Html.TextBox("policia", Model.policia, new { @size = "100", @maxlength = "100" })
+</div>
+<div class="col-lg-12 center_form">
+    <label for="meliante">Meliante</label> <br />
+    @Html.TextBox("meliante", Model.meliante, new { @size = "100", @maxlength = "100"})
+</div>
+<div class="col-lg-12 center_form">
+    <label for="data">Data</label> <br />
+    @Html.TextBox("data", Model.data, new {@type="date", @size = "100", @maxlength = "20" })
+</div>
+@Html.Hidden("ID", Model.ID)
+
+<script>
+
+
+</script>
